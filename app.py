@@ -4,14 +4,10 @@ from threading import Thread, Event
 import time
 from time import sleep
 
-
 app = Flask(__name__)
 app.config["TOP_SECRET_KEY"] = "H4SH"
 app.config["DEBUG"] = False
 app.config["TEMPLATES_AUTO_RELOAD"] = True
-
-conn = None
-cursor = None
 
 socketio = SocketIO(app, async_mode=None, logger=True, engineio_logger=True)
 
@@ -55,7 +51,6 @@ def test_connect():
 def test_disconnect():
     global thread
     print("Client {0} Disconnected.", request.remote_addr)
-
 
 if __name__ == "__main__":
     print("Starting app...")
