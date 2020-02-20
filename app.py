@@ -4,6 +4,7 @@ from threading import Thread, Event
 import time
 from time import sleep
 import database as db
+import json
 
 app = Flask(__name__)
 app.config["TOP_SECRET_KEY"] = "H4SH"
@@ -23,14 +24,14 @@ def index():
 def admin():
     return render_template("admin.html")
 
-def dispatchNotifications():
-    socketio.emit("publication", {"content":"booyah", "number":"1814"}, namespace="/")
+def dispatchNotifications(tellJSON:str):
+    socketio.emit("publication", {"content":tellJSON}, namespace="/")
 
 @app.route("/tell", methods=["POST"])
 def tell():
     if( request.method == "POST"):
         print(request.get_json())
-        dispatchNotifications()
+        dispatchNotifications(request.get_json())
         return ""
 
 def randomNumberGenerator():
@@ -47,6 +48,7 @@ def test_message(msg):
 def test_connect():
     global thread
     print("Client {0} Connected.", request.remote_addr)
+    
 
     # if not thread.isAlive():
     #     print("Starting thread...")
@@ -56,8 +58,6 @@ def test_connect():
 def test_disconnect():
     global thread
     print("Client {0} Disconnected.", request.remote_addr)
-
-
 
 if __name__ == "__main__":
     print("Starting app...")
