@@ -22,7 +22,7 @@
         <script>
             $(document).ready(function(){
                 var socket = io.connect("http://" + document.domain + ":" + location.port + "/");
-                var numbers_received = [];
+                var notifications_received = [];
 
                 socket.on("my response", function(msg){
                     $("#log").append("<p>Received: " + msg.data + "</p>");
@@ -30,19 +30,19 @@
 
                 socket.on("publication", function(msg){
                     console.log(msg.content);
+                    console.log(msg.content.id)
+                    var content = JSON.stringify(msg.content);
 
-                    if(numbers_received.length >= 10){
-                        numbers_received.shift();
+                    if(notifications_received.length >= 10){
+                        notifications_received.shift();
                     }
 
-                    numbers_received.push(msg.number);
+                    notifications_received.push(content);
                     numbers_string = "";
-                    console.log(numbers_received);
-                    for (let i = 0; i < numbers_received.length; i++) {
-                        let num_rec = numbers_received[i];
-                        console.log(num_rec);
-                        numbers_string = numbers_string + "<p>" + num_rec + "</p>";
+                    for (let i = 0; i < notifications_received.length; i++) {
+                        numbers_string = numbers_string + "<p>" + content + "</p>";
                     }
+                    
                     $("#log").html(numbers_string);
                 })
 
