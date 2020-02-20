@@ -29,10 +29,8 @@ def admin():
 @app.route("/tell", methods=["POST"])
 def tell():
     if( request.method == "POST"):
-        print("=======")
         print(request.get_json())
-        print("=======")
-        return Response(status=200)
+        return ""
 
 def randomNumberGenerator():
     while not thread_stop_event.isSet():
