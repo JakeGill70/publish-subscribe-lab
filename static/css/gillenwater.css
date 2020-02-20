@@ -1,0 +1,51 @@
+.container{
+    background-color: #F8F8F8;
+    border-radius: 0.5em;
+    margin-top:1em;
+}
+
+.card{
+    outline-color: #FFC72C;
+    outline-style: solid;
+    outline-width: 0.1em;
+    padding: 0.1em;
+    margin-top:1em;
+    margin-bottom: 1em;
+}
+
+.card-title{
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.meeting-title{
+    font-size: 18px;
+    font-style: italic;
+    font-weight: bold;
+}
+
+.list-group{
+    padding:0px;
+}
+
+body{
+    /* background-color: #041E42;   */
+    background: linear-gradient(to bottom, #195ebe, #041E42) fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.row{
+    margin:0.5em;
+}
+
+.navbar {
+    /* background-color: #00b7fa; */
+}
+
+.navbar-brand
+{
+    font-size: 32px;
+    font-style: italic;
+    font-weight: bold;
+}
