@@ -3,6 +3,7 @@ from flask_socketio import SocketIO, emit
 from threading import Thread, Event
 import time
 from time import sleep
+import database as db
 
 app = Flask(__name__)
 app.config["TOP_SECRET_KEY"] = "H4SH"
@@ -56,6 +57,9 @@ def test_disconnect():
     global thread
     print("Client {0} Disconnected.", request.remote_addr)
 
+
+
 if __name__ == "__main__":
     print("Starting app...")
+    db.createDatabase()
     app.run(host="127.0.0.1")
