@@ -17,10 +17,13 @@ socketio = SocketIO(app, async_mode=None, logger=True, engineio_logger=True)
 thread = Thread()
 thread_stop_event = Event()
 
+@app.route("/")
+def test():
+    return render_template("index.html")
+
 def randomNumberGenerator():
     while not thread_stop_event.isSet():
-        number = round(random()*10, 3)
-        print(number)
+        number = 3
         socketio.emit('newnumber', {'number':number}, namespace="/test")
         socketio.sleep(5)
 
@@ -45,5 +48,4 @@ def test_disconnect():
 
 if __name__ == "__main__":
     print("Starting app...")
-    conn, cursor = connectDatabase()
     app.run(host="127.0.0.1")
