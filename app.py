@@ -8,6 +8,7 @@ from time import sleep
 app = Flask(__name__)
 app.config["TOP_SECRET_KEY"] = "H4SH"
 app.config["DEBUG"] = False
+app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 conn = None
 cursor = None
