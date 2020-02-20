@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, copy_current_request_context, request
+from flask import Flask, render_template, url_for, copy_current_request_context, request, Response
 from flask_socketio import SocketIO, emit
 from threading import Thread, Event
 import time
@@ -25,6 +25,14 @@ def index():
 @app.route("/admin")
 def admin():
     return render_template("admin.html")
+
+@app.route("/tell", methods=["POST"])
+def tell():
+    if( request.method == "POST"):
+        print("=======")
+        print(request.get_json())
+        print("=======")
+        return Response(status=200)
 
 def randomNumberGenerator():
     while not thread_stop_event.isSet():

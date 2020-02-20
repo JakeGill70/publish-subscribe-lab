@@ -16,7 +16,38 @@
         <!-- Bootstrap JS -->
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 
-        
+        <script>
+            function convertFormArrayToAssociativeArray(formArray){
+                var formDataFormatted = {};
+                formArray.forEach(input => {
+                    formDataFormatted[input.name] = input.value
+                });
+                return formDataFormatted
+            }
+
+            function tellCreate(){
+                // Get data from form
+                var formDataRaw = $("form[name='tell_create']").serializeArray();
+                // Format it into a single JS object
+                var formData = convertFormArrayToAssociativeArray(formDataRaw);
+                // Convert that single JS object into a JSON formatted string
+                var payload = JSON.stringify(formData);
+                // Send form data as JSON string to the server
+                $.ajax({
+                    url:"./tell",
+                    type:"POST",
+                    contentType:"application/json; charset=utf-8",
+                    dataType:"json",
+                    data:payload,
+                    success:function(){
+                        alert("Tell was successfully created.");
+                    },
+                    error:function(){
+                        alert("Something went wrong. Tell was not created.");
+                    }
+                });
+            }
+        </script>
         
     </head>
       
@@ -39,18 +70,18 @@
         <div class="container">
             <div class="row">
                 <p>Create a new tell:</p>
-                <form>
-                    <label>Unique ID:</label><input type="text" name="id"><br>
-                    <label>Title:</label><input type="text" name="title"><br>
-                    <label>Teller's Name:</label><input type="text" name="name"><br>
-                    <label>Single Keyword:</label><input type="text" name="keyword"><br>
-                </form>
-                </form>
+                <form name="tell_create" action="">
+                    <label>Unique ID:</label><input type="text" name="id" value=""><br>
+                    <label>Title:</label><input type="text" name="title" value=""><br>
+                    <label>Teller's Name:</label><input type="text" name="name" value=""><br>
+                    <label>Single Keyword:</label><input type="text" name="keyword" value=""><br>
+                    <button type="button" onclick="tellCreate()">Create Tell</button>
                 </form>
             </div>
         </div>
     </body>
 
     <footer>
+        
     </footer>
 </html>
