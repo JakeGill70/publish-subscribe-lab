@@ -17,6 +17,17 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 
         <script>
+            // JQuery function that runs code as soon as a page has finished loading
+            $( document ).ready(function() {
+                // Auto-populate a new tell's ID with a random string
+                $("#tellId").val(autoGenerateId());
+            });
+
+            function autoGenerateId(){
+                // Taken from: https://gist.github.com/gordonbrander/2230317
+                return Math.random().toString(36).substr(2,9);
+            }
+
             function convertFormArrayToAssociativeArray(formArray){
                 var formDataFormatted = {};
                 formArray.forEach(input => {
@@ -37,13 +48,13 @@
                     url:"./tell",
                     type:"POST",
                     contentType:"application/json; charset=utf-8",
-                    dataType:"json",
                     data:payload,
                     success:function(){
                         alert("Tell was successfully created.");
                     },
-                    error:function(){
+                    error:function(event, request, settings){
                         alert("Something went wrong. Tell was not created.");
+                        alert(event.status + " - " + event.statusText);
                     }
                 });
             }
@@ -71,7 +82,7 @@
             <div class="row">
                 <p>Create a new tell:</p>
                 <form name="tell_create" action="">
-                    <label>Unique ID:</label><input type="text" name="id" value=""><br>
+                    <label>Unique ID:</label><input id="tellId" type="text" name="id"><br>
                     <label>Title:</label><input type="text" name="title" value=""><br>
                     <label>Teller's Name:</label><input type="text" name="name" value=""><br>
                     <label>Single Keyword:</label><input type="text" name="keyword" value=""><br>
