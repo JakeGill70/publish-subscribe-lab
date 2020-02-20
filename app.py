@@ -18,8 +18,12 @@ thread = Thread()
 thread_stop_event = Event()
 
 @app.route("/")
-def test():
+def index():
     return render_template("index.html")
+
+@app.route("/admin")
+def admin():
+    return render_template("admin.html")
 
 def randomNumberGenerator():
     while not thread_stop_event.isSet():
