@@ -22,10 +22,14 @@ def index():
 def admin():
     return render_template("admin.html")
 
+def dispatchNotifications():
+    socketio.emit("publication", {"content":"booyah", "number":"1814"}, namespace="/")
+
 @app.route("/tell", methods=["POST"])
 def tell():
     if( request.method == "POST"):
         print(request.get_json())
+        dispatchNotifications()
         return ""
 
 def randomNumberGenerator():
@@ -38,16 +42,16 @@ def randomNumberGenerator():
 def test_message(msg):
     emit("my response", {"data": "got it!"})
 
-@socketio.on("connect", namespace="/test")
+@socketio.on("connect", namespace="/")
 def test_connect():
     global thread
     print("Client {0} Connected.", request.remote_addr)
 
-    if not thread.isAlive():
-        print("Starting thread...")
-        thread = socketio.start_background_task(randomNumberGenerator)
+    # if not thread.isAlive():
+    #     print("Starting thread...")
+    #     thread = socketio.start_background_task(randomNumberGenerator)
     
-@socketio.on("disconnect", namespace="/test")
+@socketio.on("disconnect", namespace="/")
 def test_disconnect():
     global thread
     print("Client {0} Disconnected.", request.remote_addr)
