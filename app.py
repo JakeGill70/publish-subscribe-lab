@@ -34,6 +34,13 @@ def tell():
         dispatchNotifications(request.get_json())
         return ""
 
+@app.route("/user", methods=["POST"])
+def user():
+    if( request.method == "POST"):
+        print(request.get_json())
+        dispatchNotifications(request.get_json())
+        return ""
+
 def randomNumberGenerator():
     while not thread_stop_event.isSet():
         number = 3

@@ -20,29 +20,71 @@
         <!-- <script src="./static/js/Subscriber.js"></script> -->
 
         <script>
+
+            function subscribeToKeyword(){
+                $("form#emit").submit(function(event){
+                    socket.emit("my event", {data: $("#emit_data").val()});
+                    return false;
+                });
+            }
+
+            function convertFormArrayToAssociativeArray(formArray){
+                var formDataFormatted = {};
+                formArray.forEach(input => {
+                    formDataFormatted[input.name] = input.value
+                });
+                return formDataFormatted
+            }
+
+            function userCreate(){
+                // Get data from form
+                var formDataRaw = $("form[name='user_create']").serializeArray();
+                // Format it into a single JS object
+                var formData = convertFormArrayToAssociativeArray(formDataRaw);
+                // Convert that single JS object into a JSON formatted string
+                var payload = JSON.stringify(formData);
+                // Send form data as JSON string to the server
+                $.ajax({
+                    url:"./user",
+                    type:"POST",
+                    contentType:"application/json; charset=utf-8",
+                    data:payload,
+                    success:function(){
+                        alert("User was successfully created.");
+                    },
+                    error:function(event, request, settings){
+                        alert("Something went wrong. User was not created.");
+                        alert(event.status + " - " + event.statusText);
+                    }
+                });
+            }
+
             $(document).ready(function(){
                 var socket = io.connect("http://" + document.domain + ":" + location.port + "/");
                 var notifications_received = [];
 
-                socket.on("my response", function(msg){
-                    $("#log").append("<p>Received: " + msg.data + "</p>");
-                });
-
+                // Catch "publication" event
                 socket.on("publication", function(msg){
                     console.log(msg.content);
                     console.log(msg.content.id)
+                    // Convert the message content to a JSON string
                     var content = JSON.stringify(msg.content);
 
+                    // Only store up to 10 notifications at a time
                     if(notifications_received.length >= 10){
                         notifications_received.shift();
                     }
 
+                    // Add the new notification
                     notifications_received.push(content);
+
+                    // Create the HTML for presenting all of the notifications
                     numbers_string = "";
                     for (let i = 0; i < notifications_received.length; i++) {
                         numbers_string = numbers_string + "<p>" + content + "</p>";
                     }
                     
+                    // Inject the HTML into the page
                     $("#log").html(numbers_string);
                 })
 
@@ -72,6 +114,28 @@
 
         <!-- Main Content Section -->
         <div class="container">
+            <div class="row">
+                <h2>Create User</h2>
+                <form name="user_create" action="">
+                    <table>
+                        <tr>
+                            <td><label>First Name:</label></td>
+                            <td><input id="tellId" type="text" name="firstName"></td>
+                        </tr>
+                        <tr>
+                            <td><label>Last Name:</label></td>
+                            <td><input type="text" name="title"></td>
+                        <tr>
+                            <td><label>Are you a teller:</label></td>
+                            <td><input type="checkbox" name="isTeller" value=""></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><button type="button" onclick="userCreate()">Create User</button></td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
             <div class="row">
                 <p>Async page updates will appear here:</p>
                 <h2>Messages:</h2>
