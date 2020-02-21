@@ -23,11 +23,12 @@
             var socket = {}
             var subscriber = {}
             $(document).ready(function(){
-                var subscriberName = $("#subscriberName").val() == "" ? prompt("What is your subscriber name?") : $("#subscriberName").val();
-                $("#subscriberName").val(subscriberName);
+                var subscriberName = prompt("What is your subscriber name?");
 
                 socket = io.connect("http://" + document.domain + ":" + location.port + "/");
                 var notifications_received = [];
+
+                getSubscriberInfo(subscriberName);
 
                 // Publish Subscriber Infomation
                 $("#subscriptionRequest").on("submit", function(e){
@@ -93,6 +94,42 @@
                 return output;
             }
 
+            function getSubscriberInfo(subscriberName){
+                payload = {"subscriberName":subscriberName}
+                $.ajax({
+                    url:"./user",
+                    type:"GET",
+                    contentType:"application/json; charset=utf-8",
+                    data:payload,
+                    success:function(response){
+                        // If the user has an active subscription
+                        if(response != "none"){
+                            let subscriber = JSON.parse(response);
+                            setSubscriberInfo(subscriber);
+                            populateFormWithSubscriberInfo(subscriber);
+                        }
+                    }
+                })
+            }
+
+            function setSubscriberInfo(subscription){
+                subscriber = subscription;
+            }
+
+            function populateFormWithSubscriberInfo(subscriber){
+                console.log("Populating form...");
+                subscriber = JSON.parse(subscriber);
+                let subscriberName = subscriber["subscriberName"];
+                let titles = subscriber["titles"];
+                let tellers = subscriber["tellers"];
+                let keywords = subscriber["keywords"];
+                console.log([subscriber, subscriberName, titles, tellers, keywords]);
+                $("#subscriberName").val(subscriberName);
+                $("#titles").val(titles);
+                $("#tellers").val(tellers);
+                $("#keywords").val(keywords);
+            }
+
             function convertFormArrayToAssociativeArray(formArray){
                 var formDataFormatted = {};
                 formArray.forEach(input => {
@@ -132,14 +169,14 @@
                         </tr>
                         <tr>
                             <td><label>Title(s):</label></td>
-                            <td><input type="text" name="titles" placeholder="TitleA, TitleB, ..."></td>
+                            <td><input type="text" id="titles" name="titles" placeholder="TitleA, TitleB, ..."></td>
                         <tr>
                             <td><label>Teller(s):</label></td>
-                            <td><input type="text" name="tellers" placeholder="Anne Baker, Chet Dupont, ..."></td>
+                            <td><input type="text" id="tellers" name="tellers" placeholder="Anne Baker, Chet Dupont, ..."></td>
                         </tr>
                         <tr>
                             <td><label>Keyword(s):</label></td>
-                            <td><input type="text" name="keywords" placeholder="Cat, Dog, Snake, ..."></td>
+                            <td><input type="text" id="keywords" name="keywords" placeholder="Cat, Dog, Snake, ..."></td>
                         </tr>
                         <tr>
                             <td></td>

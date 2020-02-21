@@ -36,12 +36,18 @@ def tell():
         dispatchNotifications(request.get_json())
         return ""
 
-@app.route("/user", methods=["POST"])
+@app.route("/user", methods=["POST", "GET"])
 def user():
     if( request.method == "POST"):
         print(request.get_json())
         dispatchNotifications(request.get_json())
         return ""
+
+    elif( request.method == "GET"):
+        subscriberName = request.args.get("subscriberName")
+        if(subscriberName in subscribers):
+            return json.dumps(subscribers[subscriberName])
+        return "none"
 
 @socketio.on("subscriber", namespace="/")
 def subscriptionRequest(payload):
