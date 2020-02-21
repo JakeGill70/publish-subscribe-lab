@@ -16,6 +16,8 @@ socketio = SocketIO(app, async_mode=None, logger=True, engineio_logger=True)
 thread = Thread()
 thread_stop_event = Event()
 
+subscribers = {}
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -41,30 +43,22 @@ def user():
         dispatchNotifications(request.get_json())
         return ""
 
-def randomNumberGenerator():
-    while not thread_stop_event.isSet():
-        number = 3
-        socketio.emit('newnumber', {'number':number}, namespace="/test")
-        socketio.sleep(5)
-
-@socketio.on("my event")
-def test_message(msg):
-    emit("my response", {"data": "got it!"})
+@socketio.on("subscriber", namespace="/")
+def subscriptionRequest(payload):
+    payload['sid'] = request.sid # Add SID to payload for simlier organization of data
+    print("Client {0} made a request for {1}".format( request.remote_addr, payload) )
+    subscribers[payload["subscriberName"]] = payload
+    dispatchNotifications(payload)
 
 @socketio.on("connect", namespace="/")
 def test_connect():
     global thread
-    print("Client {0} Connected.", request.remote_addr)
-    
-
-    # if not thread.isAlive():
-    #     print("Starting thread...")
-    #     thread = socketio.start_background_task(randomNumberGenerator)
+    print("Client {0} Connected.".format( request.remote_addr))
     
 @socketio.on("disconnect", namespace="/")
 def test_disconnect():
     global thread
-    print("Client {0} Disconnected.", request.remote_addr)
+    print("Client {0} Disconnected.".format(request.remote_addr))
 
 if __name__ == "__main__":
     print("Starting app...")

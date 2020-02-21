@@ -20,12 +20,77 @@
         <!-- <script src="./static/js/Subscriber.js"></script> -->
 
         <script>
+            var socket = {}
+            var subscriber = {}
+            $(document).ready(function(){
+                var subscriberName = $("#subscriberName").val() == "" ? prompt("What is your subscriber name?") : $("#subscriberName").val();
+                $("#subscriberName").val(subscriberName);
 
-            function subscribeToKeyword(){
-                $("form#emit").submit(function(event){
-                    socket.emit("my event", {data: $("#emit_data").val()});
-                    return false;
+                socket = io.connect("http://" + document.domain + ":" + location.port + "/");
+                var notifications_received = [];
+
+                // Publish Subscriber Infomation
+                $("#subscriptionRequest").on("submit", function(e){
+                    // Prevent the form submission from refreshing the page
+                    e.preventDefault();
+
+                    // Get data from form
+                    var formDataRaw = $("#subscriptionRequest").serializeArray();
+                    // Format it into a single JS object
+                    var formData = convertFormArrayToAssociativeArray(formDataRaw);
+                    // Save a local copy for filtering
+                    subscriber = formData;
+                    // Send form data to the server as JSON
+                    socket.emit("subscriber", formData);
                 });
+
+                // Catch "publication" event
+                socket.on("publication", function(msg){
+                    // Convert the message content to a JSON string
+                    let content_string = JSON.stringify(msg.content);
+
+                    // Add the new notification if it updates the current subscriber information
+                    if(msg.content.subscriberName != undefined && msg.content.subscriberName == subscriber.subscriberName){
+                        notifications_received.push(content_string);
+                    }
+
+                    // If the notification is about a tell
+                    if(msg.content.id != undefined){
+                        // Add the new notification if it is about something that I have subscribed to
+                        let subTitles = subscriber.titles.split(",");
+                        let subTellers = subscriber.tellers.split(",");
+                        let subKeywords = subscriber.keywords.split(",");
+                        let conTitles = stringContainsAnyElement(msg.content.title, subTitles);
+                        let conTellers = stringContainsAnyElement(msg.content.teller, subTellers);
+                        let conKeywords = stringContainsAnyElement(msg.content.keyword, subKeywords);
+                        console.log([msg.content.title, subTitles, conTitles]);
+                        console.log([msg.content.teller, subTellers, conTellers]);
+                        console.log([msg.content.keyword, subKeywords, conTellers]);
+                        if(conTitles || conTellers || conKeywords){
+                                notifications_received.push(content_string);
+                        }
+                    }
+                    notifications_received.push("DEBUG: " + content_string);
+
+                    // Create the HTML for presenting all of the notifications
+                    numbers_string = "";
+                    for (let i = 0; i < notifications_received.length; i++) {
+                        numbers_string = numbers_string + "<p>" + notifications_received[i] + "</p>";
+                    }
+                    
+                    // Inject the HTML into the page
+                    $("#log").html(numbers_string);
+                })
+            });
+
+            function stringContainsAnyElement(mainString, strArray){
+                let output = false;
+                strArray.forEach(subString => {
+                    if(subString !== "" && mainString.indexOf(subString) > -1){
+                        output = true;
+                    }
+                });
+                return output;
             }
 
             function convertFormArrayToAssociativeArray(formArray){
@@ -36,63 +101,6 @@
                 return formDataFormatted
             }
 
-            function userCreate(){
-                // Get data from form
-                var formDataRaw = $("form[name='user_create']").serializeArray();
-                // Format it into a single JS object
-                var formData = convertFormArrayToAssociativeArray(formDataRaw);
-                // Convert that single JS object into a JSON formatted string
-                var payload = JSON.stringify(formData);
-                // Send form data as JSON string to the server
-                $.ajax({
-                    url:"./user",
-                    type:"POST",
-                    contentType:"application/json; charset=utf-8",
-                    data:payload,
-                    success:function(){
-                        alert("User was successfully created.");
-                    },
-                    error:function(event, request, settings){
-                        alert("Something went wrong. User was not created.");
-                        alert(event.status + " - " + event.statusText);
-                    }
-                });
-            }
-
-            $(document).ready(function(){
-                var socket = io.connect("http://" + document.domain + ":" + location.port + "/");
-                var notifications_received = [];
-
-                // Catch "publication" event
-                socket.on("publication", function(msg){
-                    console.log(msg.content);
-                    console.log(msg.content.id)
-                    // Convert the message content to a JSON string
-                    var content = JSON.stringify(msg.content);
-
-                    // Only store up to 10 notifications at a time
-                    if(notifications_received.length >= 10){
-                        notifications_received.shift();
-                    }
-
-                    // Add the new notification
-                    notifications_received.push(content);
-
-                    // Create the HTML for presenting all of the notifications
-                    numbers_string = "";
-                    for (let i = 0; i < notifications_received.length; i++) {
-                        numbers_string = numbers_string + "<p>" + content + "</p>";
-                    }
-                    
-                    // Inject the HTML into the page
-                    $("#log").html(numbers_string);
-                })
-
-                $("form#emit").submit(function(event){
-                    socket.emit("my event", {data: $("#emit_data").val()});
-                    return false;
-                });
-            });
         </script>
         
     </head>
@@ -115,30 +123,34 @@
         <!-- Main Content Section -->
         <div class="container">
             <div class="row">
-                <h2>Create User</h2>
-                <form name="user_create" action="">
+                <h2>Subscribe</h2>
+                <form id="subscriptionRequest" action="">
                     <table>
                         <tr>
-                            <td><label>First Name:</label></td>
-                            <td><input id="tellId" type="text" name="firstName"></td>
+                            <td><label>Subscriber Name:</label></td>
+                            <td><input id="subscriberName" type="text" name="subscriberName"></td>
                         </tr>
                         <tr>
-                            <td><label>Last Name:</label></td>
-                            <td><input type="text" name="title"></td>
+                            <td><label>Title(s):</label></td>
+                            <td><input type="text" name="titles" placeholder="TitleA, TitleB, ..."></td>
                         <tr>
-                            <td><label>Are you a teller:</label></td>
-                            <td><input type="checkbox" name="isTeller" value=""></td>
+                            <td><label>Teller(s):</label></td>
+                            <td><input type="text" name="tellers" placeholder="Anne Baker, Chet Dupont, ..."></td>
+                        </tr>
+                        <tr>
+                            <td><label>Keyword(s):</label></td>
+                            <td><input type="text" name="keywords" placeholder="Cat, Dog, Snake, ..."></td>
                         </tr>
                         <tr>
                             <td></td>
-                            <td><button type="button" onclick="userCreate()">Create User</button></td>
+                            <td><button type="submit">Subscribe</button></td>
                         </tr>
                     </table>
                 </form>
+
             </div>
             <div class="row">
-                <p>Async page updates will appear here:</p>
-                <h2>Messages:</h2>
+                <h2>Notifications:</h2>
                 <div id="log"></div>
             </div>
         </div>
