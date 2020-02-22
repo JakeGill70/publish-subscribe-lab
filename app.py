@@ -84,12 +84,20 @@ def stringContainsAnyElementOf(mainString, stringArray):
 @app.route("/subscriber", methods=["GET"])
 def subscriber():
     if( request.method == "GET"):
-        return json.dumps(subscribers)
+        subscriberName = request.args.get("subscriberName")
+        if(subscriberName != None):
+            return json.dumps(subscribers[subscriberName])
+        else:
+            return json.dumps(subscribers)
 
 @app.route("/notification", methods=["GET"])
 def notification():
     if( request.method == "GET"):
-        return json.dumps(notifications)
+        subscriberName = request.args.get("subscriberName")
+        if(subscriberName != None):
+            return json.dumps(notifications[subscriberName])
+        else:
+            return json.dumps(notifications)
 
 @app.route("/tell", methods=["POST"])
 def tell():

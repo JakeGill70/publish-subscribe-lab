@@ -53,6 +53,27 @@ var connection = {
         return subsciberInfo;
     },
 
+    getSubscriberNotificationsFromServer : function(subscriberName){
+        let notifications = []
+        let payload = {"subscriberName":subscriberName}
+        $.ajax({
+            async:false,
+            url:"./notification",
+            type:"GET",
+            contentType:"application/json; charset=utf-8",
+            data:payload,
+            success:function(response){
+                // If the user has an active subscription
+                if(response != "none"){
+                    notifications = JSON.parse(response);
+                }
+                // console.log(["+++", subscriber, "+++"]);
+                // populateFormWithSubscriberInfo(subscriber);
+            }
+        })
+        return notifications;
+    },
+
     submitSubscriberInfo: function(){
         // Get the latest info from the form
         let subscriber = this.view.getSubscriberInfoFromForm();

@@ -27,6 +27,14 @@ $(window).on("load", function(){
         let subscriberName = view.openSubscriberNamePrompt();
         connection.subscriber = connection.getSubscriberInfoFromServer(subscriberName);
 
+        // Collect any missed notifications
+        let oldNotifications = connection.getSubscriberNotificationsFromServer(subscriberName);
+        oldNotifications.forEach(notification => {
+            console.log([connection.subscriber, notification]);
+            let notificationWrapper = {content: notification}
+            notificationService.notificationReceived(notificationWrapper, connection.subscriber);
+        });
+
         view.populateFormWithSubscriberInfo(connection.subscriber);
     }) 
 });
