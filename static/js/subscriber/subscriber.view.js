@@ -4,24 +4,12 @@
 // Mutates the HTML.
 var view = {
     getSubscriberInfoFromForm : function(){
+        // XXX: Requires that the form input's have the same name as a subscriber's attributes.
         // Get data from form
-        let formDataRaw = $("#subscriptionRequest").serializeArray();
-        // Format it into a single JS object
-        let formData = this.convertFormArrayToAssociativeArray(formDataRaw);
-        // Create a subscriber
-        // Not strictly necessary, but I (Jake Gillenwater), feel like this line helps with readability
-        let subscriber = Subscriber(); 
-        // XXX: Form input's must be named the same as subscriber attributes
-        subscriber = formData;
+        let formData = formToObject.convert("#subscriptionRequest");
+        // That data is a the same a subscriber object
+        let subscriber = formData;
         return subscriber;
-    },
-
-    convertFormArrayToAssociativeArray: function(formArray){
-        let formDataFormatted = {};
-        formArray.forEach(input => {
-            formDataFormatted[input.name] = input.value
-        });
-        return formDataFormatted
     },
 
     populateFormWithSubscriberInfo: function(subscriber){
@@ -54,6 +42,6 @@ var view = {
 
     initJqueryHooks : function(){
         // Publish Subscriber Infomation
-        $("#subscriptionRequest").on("submit", function(domEvent){connection.submitSubscriberInfo(domEvent)});
+        $("#subscriptionRequest").on("submit", function(domEvent){domEvent.preventDefault; connection.submitSubscriberInfo();});
     }
 }

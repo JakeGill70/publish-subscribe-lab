@@ -53,10 +53,7 @@ var connection = {
         return subsciberInfo;
     },
 
-    submitSubscriberInfo: function(domEvent){
-        // Prevent the form submission from refreshing the page
-        domEvent.preventDefault();
-
+    submitSubscriberInfo: function(){
         let subscriber = this.view.getSubscriberInfoFromForm();
         
         // Send form data to the server as JSON

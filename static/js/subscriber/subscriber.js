@@ -6,6 +6,7 @@ $(window).on("load", function(){
     // This method is preferred because it only requires a single reference inside of the HTML file.
     $.when(
         $.getScript(currentDomainURL+"static/js/utilities/string.extended.js"),
+        $.getScript(currentDomainURL+"static/js/utilities/formToObjectConverter.js"),
         $.getScript(currentDomainURL+"static/js/subscriber/subscriber.data.js"),
         $.getScript(currentDomainURL+"static/js/subscriber/subscriber.connection.js"),
         $.getScript(currentDomainURL+"static/js/subscriber/subscriber.notificationService.js"),
