@@ -53,11 +53,11 @@ var notificationService = {
         let shouldDisplay = satisfiesTitles && satisfiesTellers && satisfiesKeywords;
         // TODO: Remove this debug-info 
         // UN-Comment for Debug-Info
-        // console.log([   "subs", subTitles, subTellers, subKeywords,
-        //                 "empty", subEmptyTitles, subEmptyTellers, subEmptyKeywords,
-        //                 "content", publication.content.title, publication.content.teller, publication.content.keyword,
-        //                 "contains", conTitles, conTellers, conKeywords, 
-        //                 "results", satisfiesTitles, satisfiesTellers, satisfiesKeywords])
+        console.log([   "subs", subTitles, subTellers, subKeywords,
+                        "empty", subEmptyTitles, subEmptyTellers, subEmptyKeywords,
+                        "content", publication.content.title, publication.content.teller, publication.content.keyword,
+                        "contains", conTitles, conTellers, conKeywords, 
+                        "results", satisfiesTitles, satisfiesTellers, satisfiesKeywords])
         if(shouldDisplay){
             this.notificationsReceived.push(JSON.stringify(publication.content));
             this.view.updateNotificationTable(this.notificationsReceived);

@@ -6,10 +6,19 @@ String.prototype.containsAnyElementOf = function(strArray){
     let thisString = this.valueOf();
 
     strArray.forEach(subString => {
-        subsString = $.trim(subString);
-        if(subString !== "" && thisString.indexOf(subString) > -1){
+        let ts = thisString.safeTrim();
+        let ss = subString.safeTrim();
+        console.log([ss, ts]);
+        if(ss !== "" && ts.indexOf(ss) > -1){
             output = true;
         }
     });
     return output;
+}
+
+String.prototype.safeTrim = function(){
+    // Taken from https://www.w3schools.com/jsref/jsref_trim_string.asp
+    let thisString = this.valueOf();
+    let trimmedString = thisString.replace(/^\s+|\s+$/gm,'');
+    return trimmedString;
 }

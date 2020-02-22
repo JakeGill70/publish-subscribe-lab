@@ -42,6 +42,6 @@ var view = {
 
     initJqueryHooks : function(){
         // Publish Subscriber Infomation
-        $("#subscriptionRequest").on("submit", function(domEvent){domEvent.preventDefault; connection.submitSubscriberInfo();});
+        $("#subscriptionRequest").on("submit", function(domEvent){domEvent.preventDefault(); connection.submitSubscriberInfo();});
     }
 }

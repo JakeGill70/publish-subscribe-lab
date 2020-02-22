@@ -54,8 +54,10 @@ var connection = {
     },
 
     submitSubscriberInfo: function(){
+        // Get the latest info from the form
         let subscriber = this.view.getSubscriberInfoFromForm();
-        
+        // Update the local model
+        this.subscriber = subscriber;
         // Send form data to the server as JSON
         this.socket.emit("subscriber", subscriber);
     }

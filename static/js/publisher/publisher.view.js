@@ -1,6 +1,6 @@
 var view = {
     setTellId : function(id){
-        $("#tellId").val(id);
+        $("#id").val(id);
     },
 
     getTellInfoFromForm : function(){
