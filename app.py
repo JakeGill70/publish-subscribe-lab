@@ -22,9 +22,9 @@ subscribers = {}
 def index():
     return render_template("index.html")
 
-@app.route("/admin")
+@app.route("/publish")
 def admin():
-    return render_template("admin.html")
+    return render_template("publish.html")
 
 def dispatchNotifications(tellJSON:str):
     socketio.emit("publication", {"content":tellJSON}, namespace="/")
