@@ -21,7 +21,7 @@ var notificationService = {
         }
     },
 
-    notificationAboutASubscriber(publication, subscriber){
+    notificationAboutASubscriber: function(publication, subscriber){
         // Add the new notification if it updates the current subscriber information
         if(publication.content.subscriberName == subscriber.subscriberName){
             this.notificationsReceived.push(JSON.stringify(publication.content));
@@ -29,7 +29,7 @@ var notificationService = {
         }
     },
 
-    notificationAboutTell(publication, subscriber){
+    notificationAboutTell: function(publication, subscriber){
         // Add the new notification if it is about something that I have subscribed to
         // Get subscriber information
         let subTitles = subscriber.titles.split(",");
