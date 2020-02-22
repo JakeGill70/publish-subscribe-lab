@@ -85,9 +85,10 @@
             });
 
             function stringContainsAnyElement(mainString, strArray){
-                let output = false;
+                let output = false
                 strArray.forEach(subString => {
-                    if(subString !== "" && mainString.indexOf(subString) > -1){
+                    subsString = $.trim(subString);
+                    if(subString !== "" && mainString.indexOf(subString > -1)){
                         output = true;
                     }
                 });
@@ -103,11 +104,17 @@
                     data:payload,
                     success:function(response){
                         // If the user has an active subscription
+                        let subscriber = {}
                         if(response != "none"){
-                            let subscriber = JSON.parse(response);
-                            setSubscriberInfo(subscriber);
-                            populateFormWithSubscriberInfo(subscriber);
+                            subscriber = JSON.parse(response);
                         }
+                        else {
+                            subscriber = {"subscriberName": subscriberName,
+                                            "titles": "", "tellers": "", "keywords": ""}
+                        }
+                        console.log(["+++", subscriber, "+++"]);
+                        setSubscriberInfo(subscriber);
+                        populateFormWithSubscriberInfo(subscriber);
                     }
                 })
             }
@@ -117,13 +124,10 @@
             }
 
             function populateFormWithSubscriberInfo(subscriber){
-                console.log("Populating form...");
-                subscriber = JSON.parse(subscriber);
-                let subscriberName = subscriber["subscriberName"];
-                let titles = subscriber["titles"];
-                let tellers = subscriber["tellers"];
-                let keywords = subscriber["keywords"];
-                console.log([subscriber, subscriberName, titles, tellers, keywords]);
+                let subscriberName = subscriber.subscriberName;
+                let titles = subscriber.titles;
+                let tellers = subscriber.tellers;
+                let keywords = subscriber.keywords;
                 $("#subscriberName").val(subscriberName);
                 $("#titles").val(titles);
                 $("#tellers").val(tellers);
