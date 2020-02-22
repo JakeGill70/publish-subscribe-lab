@@ -17,6 +17,7 @@ thread = Thread()
 thread_stop_event = Event()
 
 subscribers = {}
+notifications = {}
 
 @app.route("/")
 def index():
@@ -28,6 +29,16 @@ def admin():
 
 def dispatchNotifications(tellJSON:str):
     socketio.emit("publication", {"content":tellJSON}, namespace="/")
+    
+@app.route("/subscriber", methods=["GET"])
+def subscriber():
+    if( request.method == "GET"):
+        return json.dumps(subscribers)
+
+@app.route("/notification", methods=["GET"])
+def notification():
+    if( request.method == "GET"):
+        return json.dumps(notifications)
 
 @app.route("/tell", methods=["POST"])
 def tell():
