@@ -1,4 +1,10 @@
 var presenter = {
+    view = {},
+
+    setView : function(v){
+        this.view = v;
+    },
+
     autoGenerateId : function(){
         // Taken from: https://gist.github.com/gordonbrander/2230317
         return Math.random().toString(36).substr(2,9);
@@ -6,7 +12,7 @@ var presenter = {
 
     sendTellToServer : function(){
         // Get data from form
-        var formData = view.getTellInfoFromForm();
+        var formData = this.view.getTellInfoFromForm();
         // Convert that single JS object into a JSON formatted string
         var payload = JSON.stringify(formData);
         // Send form data as JSON string to the server
