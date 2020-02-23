@@ -6,34 +6,43 @@ from time import sleep
 import database as db
 import json
 
+# Flask configuration
 app = Flask(__name__)
-app.config["TOP_SECRET_KEY"] = "H4SH"
+app.config["TOP_SECRET_KEY"] = "Tony$112358$Rice"
 app.config["DEBUG"] = False
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
+# Socket.io configuration
 socketio = SocketIO(app, async_mode=None, logger=True, engineio_logger=True)
 
-thread = Thread()
-thread_stop_event = Event()
-
+# Holds subscriber/subcription requests as an associative array of associative arrays.
 subscribers = {}
+# Holds notifions as an associative array of associative arrays.
 notifications = {}
 
+# Serves UI for subscriptions
 @app.route("/")
 def index():
     return render_template("index.html")
 
+# Serves UI for publications/notifications
 @app.route("/publish")
 def admin():
     return render_template("publish.html")
 
+# Broadcast new notifications
+# Stores them with the appropriate subscribers/subscriptions
 def dispatchNotifications(publicationJSON:str):
     socketio.emit("publication", {"content":publicationJSON}, namespace="/")
     for subscriber in subscribers:
         if(shouldSaveNotification(subscribers[subscriber], publicationJSON)):
             notifications[subscriber].append(publicationJSON)
-    
+
+# Determines if a notification/publication meets the subscriber's critia. 
 def shouldSaveNotification(subscriber, notification):
+    # Must use try-except's inplace of if-elif-else because requesting data
+    # from an associative array with a key that does not exists throws a
+    # KeyError exception.
     try:
         if(notification["subscriberName"] != None):
             print("Notification is about a subscriber.")
@@ -47,33 +56,42 @@ def shouldSaveNotification(subscriber, notification):
             print("Notification type is unknwon.")
             return False
 
+# Determines if a notification is about a particular subscriber
 def isNotificationAboutSubscriber(subscriber, notification):
     if(notification["subscriberName"] == subscriber["subscriberName"]):
         return True
 
-
+# Determines if a notification meets a subscriber's criteria to be stored
 def isNotificationAboutSubscriberInterest(subscriber, notification):
-   subTitles = subscriber["titles"].split(",")
-   subTellers = subscriber["tellers"].split(",")
-   subKeywords = subscriber["keywords"].split(",")
+    # This method is also done client side because of broadcasting
 
-   subEmptyTitles = subscriber["titles"] == ""
-   subEmptyTellers = subscriber["tellers"] == ""
-   subEmptyKeywords = subscriber["keywords"] == ""
+    # Get a subscriber's criteria
+    subTitles = subscriber["titles"].split(",")
+    subTellers = subscriber["tellers"].split(",")
+    subKeywords = subscriber["keywords"].split(",")
 
-   conTitles = stringContainsAnyElementOf(notification["title"], subTitles)
-   conTellers = stringContainsAnyElementOf(notification["teller"], subTellers)
-   conKeywords = stringContainsAnyElementOf(notification["keyword"], subKeywords)
+    # Determine if the subscriber does not have a preference for a particular criteria
+    subEmptyTitles = subscriber["titles"] == ""
+    subEmptyTellers = subscriber["tellers"] == ""
+    subEmptyKeywords = subscriber["keywords"] == ""
 
-   satisfiesTitles = conTitles or subEmptyTitles
-   satisfiesTellers = conTellers or subEmptyTellers
-   satisfiesKeywords = conKeywords or subEmptyKeywords
+    # Determine if the notification's attributes meet the subscriber's criteria
+    conTitles = stringContainsAnyElementOf(notification["title"], subTitles)
+    conTellers = stringContainsAnyElementOf(notification["teller"], subTellers)
+    conKeywords = stringContainsAnyElementOf(notification["keyword"], subKeywords)
 
-   satisfiesAllCriteria = satisfiesTitles and satisfiesTellers and satisfiesKeywords
+    # Determine if notification attributes that did not meet the subscriber's criteria
+    # is because the subscriber did not have a preference for a particular criteria
+    satisfiesTitles = conTitles or subEmptyTitles
+    satisfiesTellers = conTellers or subEmptyTellers
+    satisfiesKeywords = conKeywords or subEmptyKeywords
 
-   return satisfiesAllCriteria
+    # Determine if all of the subscriber's criteria has been met
+    satisfiesAllCriteria = satisfiesTitles and satisfiesTellers and satisfiesKeywords
 
+    return satisfiesAllCriteria
 
+# Determines if any element inside of a list of strings is a substring to a particular string
 def stringContainsAnyElementOf(mainString, stringArray):
     output = False
     for subString in stringArray:
@@ -81,6 +99,7 @@ def stringContainsAnyElementOf(mainString, stringArray):
             output = True
     return output
 
+# REST-API for subscriber/subscription info
 @app.route("/subscriber", methods=["GET"])
 def subscriber():
     if( request.method == "GET"):
@@ -90,6 +109,7 @@ def subscriber():
         else:
             return json.dumps(subscribers)
 
+# REST-API for notification info
 @app.route("/notification", methods=["GET"])
 def notification():
     if( request.method == "GET"):
@@ -99,6 +119,7 @@ def notification():
         else:
             return json.dumps(notifications)
 
+# REST-API for tell info
 @app.route("/tell", methods=["POST"])
 def tell():
     if( request.method == "POST"):
@@ -106,6 +127,7 @@ def tell():
         dispatchNotifications(request.get_json())
         return ""
 
+# REST-API for user info
 @app.route("/user", methods=["POST", "GET"])
 def user():
     if( request.method == "POST"):
@@ -119,6 +141,7 @@ def user():
             return json.dumps(subscribers[subscriberName])
         return "none"
 
+# Socket.IO event handler for new subscribers/subscription request
 @socketio.on("subscriber", namespace="/")
 def subscriptionRequest(payload):
     payload['sid'] = request.sid # Add SID to payload for simlier organization of data
@@ -130,16 +153,17 @@ def subscriptionRequest(payload):
 
     dispatchNotifications(payload)
 
+# Socket.IO event handler for when clients connect
 @socketio.on("connect", namespace="/")
 def test_connect():
-    global thread
     print("Client {0} Connected.".format( request.remote_addr))
     
+# Socket.IO event handler for when clients disconnect
 @socketio.on("disconnect", namespace="/")
 def test_disconnect():
-    global thread
     print("Client {0} Disconnected.".format(request.remote_addr))
 
+# Program entry point
 if __name__ == "__main__":
     print("Starting app...")
     db.createDatabase()

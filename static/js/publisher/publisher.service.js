@@ -14,6 +14,7 @@ $( window ).on("load", function() {
         
         // Initialize Objects
         view.initJqueryHooks();
+        presenter.setView(view);
 
         // Auto-populate a new tell's ID with a random string
         view.setTellId(presenter.autoGenerateId());

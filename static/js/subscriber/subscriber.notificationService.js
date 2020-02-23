@@ -8,28 +8,28 @@ var notificationService = {
         this.view = v;
     },
 
-    notificationReceived: function(publication, subscriber){
+    notificationReceived: function(notification, subscriber){
         
-        if(publication.content.subscriberName != undefined){
-            this.notificationAboutASubscriber(publication, subscriber);
+        if(notification.content.subscriberName != undefined){
+            this.notificationAboutASubscriber(notification, subscriber);
         }
-        else if(publication.content.id != undefined){
-            this.notificationAboutTell(publication, subscriber);
+        else if(notification.content.id != undefined){
+            this.notificationAboutATell(notification, subscriber);
         }
         else{
-            console.error(["Publication type is unknown to the notification service", publication]);
+            console.error(["Publication type is unknown to the notification service", notification]);
         }
     },
 
-    notificationAboutASubscriber: function(publication, subscriber){
+    notificationAboutASubscriber: function(notification, subscriber){
         // Add the new notification if it updates the current subscriber information
-        if(publication.content.subscriberName == subscriber.subscriberName){
-            this.notificationsReceived.push(JSON.stringify(publication.content));
+        if(notification.content.subscriberName == subscriber.subscriberName){
+            this.notificationsReceived.push(JSON.stringify(notification.content));
             this.view.updateNotificationTable(this.notificationsReceived)
         }
     },
 
-    notificationAboutTell: function(publication, subscriber){
+    notificationAboutATell: function(notification, subscriber){
         // Add the new notification if it is about something that I have subscribed to
         // Get subscriber information
         let subTitles = subscriber.titles.split(",");
@@ -40,9 +40,9 @@ var notificationService = {
         let subEmptyTellers = subscriber.tellers=="";
         let subEmptyKeywords = subscriber.keywords=="";
         // Determine if the notification is about the subscriber's interest
-        let conTitles = publication.content.title.containsAnyElementOf(subTitles);
-        let conTellers = publication.content.teller.containsAnyElementOf(subTellers);
-        let conKeywords = publication.content.keyword.containsAnyElementOf(subKeywords);
+        let conTitles = notification.content.title.containsAnyElementOf(subTitles);
+        let conTellers = notification.content.teller.containsAnyElementOf(subTellers);
+        let conKeywords = notification.content.keyword.containsAnyElementOf(subKeywords);
         
         // Determine if their was a false negative because the subscriber
         // did not care about a particular attribute
@@ -55,11 +55,11 @@ var notificationService = {
         // UN-Comment for Debug-Info
         console.log([   "subs", subTitles, subTellers, subKeywords,
                         "empty", subEmptyTitles, subEmptyTellers, subEmptyKeywords,
-                        "content", publication.content.title, publication.content.teller, publication.content.keyword,
+                        "content", notification.content.title, notification.content.teller, notification.content.keyword,
                         "contains", conTitles, conTellers, conKeywords, 
                         "results", satisfiesTitles, satisfiesTellers, satisfiesKeywords])
         if(shouldDisplay){
-            this.notificationsReceived.push(JSON.stringify(publication.content));
+            this.notificationsReceived.push(JSON.stringify(notification.content));
             this.view.updateNotificationTable(this.notificationsReceived);
         }
     }

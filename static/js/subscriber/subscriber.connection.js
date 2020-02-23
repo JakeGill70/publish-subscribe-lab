@@ -27,9 +27,9 @@ var connection = {
         this.socket.on("publication", function(publication) { self.notificationReceived(publication);});
     },
 
-    notificationReceived: function(publication){
+    notificationReceived: function(notification){
         
-        notificationService.notificationReceived(publication, this.subscriber);
+        notificationService.notificationReceived(notification, this.subscriber);
     },
 
     getSubscriberInfoFromServer : function(subscriberName){
