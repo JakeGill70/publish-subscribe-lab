@@ -115,7 +115,13 @@ def notification():
     if( request.method == "GET"):
         subscriberName = request.args.get("subscriberName")
         if(subscriberName != None):
-            return json.dumps(notifications[subscriberName])
+            # If the client requested information about a specific subscriber
+            try:
+                # Return that subscriber's notifications
+                return json.dumps(notifications[subscriberName])
+            except KeyError as ke:
+                # Return "none" if that subscriber does not exists
+                return "{}"
         else:
             return json.dumps(notifications)
 

@@ -29,13 +29,16 @@ $(window).on("load", function(){
 
         // Collect any missed notifications
         let oldNotifications = connection.getSubscriberNotificationsFromServer(subscriberName);
-        oldNotifications.forEach(notification => {
-            console.log([connection.subscriber, notification]);
-            let notificationWrapper = {content: notification}
-            notificationService.notificationReceived(notificationWrapper, connection.subscriber);
-        });
-
-        view.populateFormWithSubscriberInfo(connection.subscriber);
+        console.log(oldNotifications);
+        if( oldNotifications.length != undefined && oldNotifications.length > 0){
+            oldNotifications.forEach(notification => {
+                console.log([connection.subscriber, notification]);
+                let notificationWrapper = {content: notification}
+                notificationService.notificationReceived(notificationWrapper, connection.subscriber);
+            });
+    
+            view.populateFormWithSubscriberInfo(connection.subscriber);
+        }
     }) 
 });
 
