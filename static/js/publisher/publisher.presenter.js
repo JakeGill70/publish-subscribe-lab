@@ -1,5 +1,5 @@
 var presenter = {
-    view = {},
+    view : {},
 
     setView : function(v){
         this.view = v;
